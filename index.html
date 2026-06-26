@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Statistiques SI/NSI - Annales et Tendances</title>
+  <!-- Intégration de Chart.js via CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <!-- Intégration de jsPDF pour l'export PDF (optionnel) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>📊 Base de Données des Examens SI et NSI</h1>
+      <p>Statistiques, tendances et annales centralisées</p>
+    </header>
+
+    <!-- Onglets pour naviguer entre les sections -->
+    <nav class="tabs">
+      <button class="tab-button active" onclick="openTab('statistiques')">📈 Statistiques</button>
+      <button class="tab-button" onclick="openTab('recherche')">🔍 Recherche</button>
+      <button class="tab-button" onclick="openTab('tendances')">📉 Tendances</button>
+    </nav>
+
+    <!-- Onglet Statistiques -->
+    <div id="statistiques" class="tab-content" style="display: block;">
+      <h2>Statistiques Descriptives</h2>
+
+      <!-- Filtres pour les statistiques -->
+      <div class="filtres">
+        <div class="filtre-group">
+          <label for="specialite-stats">Spécialité:</label>
+          <select id="specialite-stats">
+            <option value="toutes">Toutes</option>
+            <option value="NSI">NSI</option>
+            <option value="SI">SI</option>
+          </select>
+        </div>
+
+        <div class="filtre-group">
+          <label for="type-epreuve-stats">Type d'épreuve:</label>
+          <select id="type-epreuve-stats">
+            <option value="tous">Tous</option>
+            <option value="écrit">Écrit</option>
+            <option value="pratique">Pratique</option>
+          </select>
+        </div>
+
+        <div class="filtre-group">
+          <label for="session-stats">Année:</label>
+          <select id="session-stats">
+            <option value="toutes">Toutes</option>
+            <option value="2020">2020</option>
+            <option value="2021">2021</option>
+            <option value="2022">2022</option>
+            <option value="2023">2023</option>
+            <option value="2024">2024</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Graphiques -->
+      <div class="graphiques-container">
+        <div class="graphique">
+          <h3>Fréquence des Domaines</h3>
+          <canvas id="domainesChart"></canvas>
+        </div>
+        <div class="graphique">
+          <h3>Répartition par Type d'Épreuve</h3>
+          <canvas id="typeEpreuveChart"></canvas>
+        </div>
+        <div class="graphique">
+          <h3>Répartition par Spécialité</h3>
+          <canvas id="specialiteChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Bouton d'export -->
+      <div class="export-buttons">
+        <button onclick="exportToCSV()">📥 Exporter en CSV</button>
+        <button onclick="exportToPDF()">📥 Exporter en PDF</button>
+      </div>
+    </div>
+
+    <!-- Onglet Recherche -->
+    <div id="recherche" class="tab-content">
+      <h2>Recherche Avancée</h2>
+
+      <!-- Filtres pour la recherche -->
+      <div class="filtres">
+        <div class="filtre-group">
+          <label for="specialite-recherche">Spécialité:</label>
+          <select id="specialite-recherche">
+            <option value="toutes">Toutes</option>
+            <option value="NSI">NSI</option>
+            <option value="SI">SI</option>
+          </select>
+        </div>
+
+        <div class="filtre-group">
+          <label for="type-epreuve-recherche">Type d'épreuve:</label>
+          <select id="type-epreuve-recherche">
+            <option value="tous">Tous</option>
+            <option value="écrit">Écrit</option>
+            <option value="pratique">Pratique</option>
+          </select>
+        </div>
+
+        <div class="filtre-group">
+          <label for="session-recherche">Année:</label>
+          <select id="session-recherche">
+            <option value="toutes">Toutes</option>
+            <option value="2020">2020</option>
+            <option value="2021">2021</option>
+            <option value="2022">2022</option>
+            <option value="2023">2023</option>
+            <option value="2024">2024</option>
+          </select>
+        </div>
+
+        <div class="filtre-group">
+          <label for="domaine-recherche">Domaine:</label>
+          <select id="domaine-recherche">
+            <option value="tous">Tous</option>
+            <option value="Algorithmique">Algorithmique</option>
+            <option value="Programmation">Programmation</option>
+            <option value="Systèmes techniques">Systèmes techniques</option>
+            <option value="Réseaux">Réseaux</option>
+            <option value="Bases de données">Bases de données</option>
+            <option value="IA">IA</option>
+          </select>
+        </div>
+
+        <div class="filtre-group">
+          <label for="competence-recherche">Compétence:</label>
+          <select id="competence-recherche">
+            <option value="toutes">Toutes</option>
+            <option value="Analyser">Analyser</option>
+            <option value="Concevoir">Concevoir</option>
+            <option value="Programmer">Programmer</option>
+            <option value="Tester">Tester</option>
+            <option value="Valider">Valider</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Tableau des résultats -->
+      <div class="tableau-sujets">
+        <h3>Résultats de la Recherche</h3>
+        <table id="sujetsTable">
+          <thead>
+            <tr>
+              <th>Titre</th>
+              <th>Spécialité</th>
+              <th>Type</th>
+              <th>Année</th>
+              <th>Centre</th>
+              <th>Domaines</th>
+              <th>Compétences</th>
+              <th>Mots-clés</th>
+              <th>PDF</th>
+            </tr>
+          </thead>
+          <tbody id="sujetsTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Onglet Tendances -->
+    <div id="tendances" class="tab-content">
+      <h2>Analyse des Tendances</h2>
+
+      <!-- Filtres pour les tendances -->
+      <div class="filtres">
+        <div class="filtre-group">
+          <label for="specialite-tendances">Spécialité:</label>
+          <select id="specialite-tendances">
+            <option value="toutes">Toutes</option>
+            <option value="NSI">NSI</option>
+            <option value="SI">SI</option>
+          </select>
+        </div>
+
+        <div class="filtre-group">
+          <label for="mot-cle-tendances">Mot-clé:</label>
+          <select id="mot-cle-tendances">
+            <option value="tous">Tous</option>
+            <option value="IA">IA</option>
+            <option value="Récursivité">Récursivité</option>
+            <option value="Bases de données">Bases de données</option>
+            <option value="Réseaux">Réseaux</option>
+            <option value="Python">Python</option>
+            <option value="Robotique">Robotique</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Graphiques de tendances -->
+      <div class="graphiques-container">
+        <div class="graphique">
+          <h3>Évolution des Thèmes par Année</h3>
+          <canvas id="tendancesThemesChart"></canvas>
+        </div>
+        <div class="graphique">
+          <h3>Évolution des Compétences par Année</h3>
+          <canvas id="tendancesCompetencesChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="data.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
